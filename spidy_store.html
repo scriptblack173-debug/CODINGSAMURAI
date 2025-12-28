@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spidy Gadgets - Animated Kids Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+        body{
+            font-family:'Poppins', sans-serif;
+            overflow-x:hidden;
+            background:#000;
+            color:white;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ff1b1b;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #2160de;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.15s ease;
+        }
+
+        /* Spider Web Animated Background */
+        #webCanvas{
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            z-index:-1;
+            background:radial-gradient(circle at center, #1a0033 0%, #000 70%);
+        }
+
+        header{
+            width:100%;
+            padding:20px 50px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            position:fixed;
+            top:0;
+            left:0;
+            backdrop-filter:blur(10px);
+            z-index:10;
+            background: rgba(0,0,0,0.7);
+            border-bottom: 2px solid #ff1b1b;
+        }
+        header h1{
+            font-family:'Bangers', cursive;
+            font-size:40px;
+            color:#ff1b1b;
+            letter-spacing:2px;
+            text-shadow:0 0 10px red;
+            animation: glow 2s infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 10px red; }
+            to { text-shadow: 0 0 20px red, 0 0 30px #ff4d4d; }
+        }
+        nav a{
+            margin-left:20px;
+            color:white;
+            font-size:18px;
+            font-weight:500;
+            transition:0.3s;
+            position: relative;
+            text-decoration: none;
+        }
+        nav a:hover{
+            color:#ff1b1b;
+            text-shadow:0 0 10px red;
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #ff1b1b;
+            transition: width 0.3s;
+        }
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Page Container */
+        .page-container {
+            display: none;
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+        .active-page {
+            display: block;
+        }
+
+        /* HERO SECTION */
+        .hero{
+            height:100vh;
+            display:flex;
+            align-items:center;
+            padding:0 80px;
+            position:relative;
+            overflow: hidden;
+        }
+        .hero .text{
+            max-width:50%;
+            z-index:2;
+        }
+        .hero h2{
+            font-size:60px;
+            font-family:'Bangers';
+            color:#ff1b1b;
+            text-shadow:0px 0px 10px red;
+            animation:slideDown 1s ease-out;
+            line-height: 1.1;
+        }
+        .hero p{
+            font-size:20px;
+            margin:20px 0;
+            animation:fadeIn 2s;
+            color: #ddd;
+        }
+        .hero button{
+            background:#ff1b1b;
+            padding:15px 25px;
+            border:none;
+            color:white;
+            font-size:20px;
+            border-radius:10px;
+            cursor:pointer;
+            font-family:'Bangers';
+            letter-spacing:1px;
+            transition:0.3s;
+            animation:bounce 2s infinite;
+            box-shadow: 0 5px 15px rgba(255,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero button:hover{
+            background:#ff4d4d;
+            transform:scale(1.1);
+            box-shadow: 0 10px 20px rgba(255,0,0,0.6);
+        }
+        .hero button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .hero button:hover::before {
+            left: 100%;
+        }
+
+        .hero img{
+            position:absolute;
+            right:80px;
+            width:500px;
+            animation:swing 3s infinite ease-in-out;
+            filter:drop-shadow(0 0 20px red);
+            z-index: 1;
+        }
+
+        /* Floating Spiders */
+        .spider {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="30" r="20" fill="%231a1a1a"/><circle cx="50" cy="30" r="15" fill="%23ff1b1b"/><circle cx="45" cy="25" r="3" fill="white"/><circle cx="55" cy="25" r="3" fill="white"/><path d="M30,30 Q50,60 70,30" stroke="%231a1a1a" stroke-width="8" fill="none"/><path d="M25,50 Q50,30 75,50" stroke="%231a1a1a" stroke-width="8" fill="none"/><path d="M30,70 Q50,40 70,70" stroke="%231a1a1a" stroke-width="8" fill="none"/></svg>');
+            background-size: contain;
+            z-index: 0;
+            animation: spiderFloat 20s linear infinite;
+        }
+
+        @keyframes spiderFloat {
+            0% {
+                top: -50px;
+                left: 10%;
+            }
+            25% {
+                top: 30%;
+                left: 80%;
+            }
+            50% {
+                top: 80%;
+                left: 60%;
+            }
+            75% {
+                top: 40%;
+                left: 20%;
+            }
+            100% {
+                top: -50px;
+                left: 90%;
+            }
+        }
+
+        @keyframes slideDown{
+            0%{opacity:0; transform:translateY(-50px);} 100%{opacity:1; transform:translateY(0);}
+        }
+        @keyframes fadeIn{
+            0%{opacity:0;} 100%{opacity:1;}
+        }
+        @keyframes bounce{
+            0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} 
+        }
+        @keyframes swing{
+            0%,100%{transform:rotate(0);} 50%{transform:rotate(5deg);} 
+        }
+
+        /* PRODUCT SECTION */
+        .products{
+            padding:100px 50px;
+            background:rgba(10, 0, 20, 0.8);
+            text-align:center;
+            position: relative;
+            overflow: hidden;
+        }
+        .products h2{
+            font-family:'Bangers';
+            font-size:50px;
+            color:#ff1b1b;
+            text-shadow:0 0 10px red;
+            margin-bottom: 20px;
+        }
+        .products p {
+            font-size: 18px;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            color: #ccc;
+        }
+        .grid{
+            margin-top:50px;
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+            gap:30px;
+        }
+        .card{
+            background:rgba(30, 30, 40, 0.8);
+            padding:20px;
+            border-radius:20px;
+            box-shadow:0 0 15px rgba(255,0,0,0.4);
+            transition:0.4s;
+            cursor:pointer;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card:hover{
+            transform:scale(1.05) rotate(-2deg);
+            box-shadow:0 0 30px rgba(255,0,0,0.8);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,27,27,0.1), rgba(33,96,222,0.1));
+            z-index: -1;
+        }
+        .product-icon {
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #ff1b1b, #2160de);
+            border-radius: 50%;
+            margin-bottom: 20px;
+            transition: transform 0.5s;
+            font-size: 50px;
+            color: white;
+        }
+        .card:hover .product-icon {
+            transform: scale(1.1) rotate(10deg);
+        }
+        .card h3{
+            margin-top:15px;
+            font-size:22px;
+            color: white;
+        }
+        .card .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff1b1b;
+            margin: 10px 0;
+        }
+        .card button {
+            background: #ff1b1b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Bangers';
+            font-size: 16px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            margin-top: auto;
+        }
+        .card button:hover {
+            background: #2160de;
+            transform: scale(1.05);
+        }
+
+        /* Locations Section */
+        .locations {
+            padding: 80px 50px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        .locations h2 {
+            font-family: 'Bangers';
+            font-size: 50px;
+            color: #ff1b1b;
+            text-shadow: 0 0 10px red;
+            margin-bottom: 40px;
+        }
+        .location-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        .location-card {
+            background: rgba(30, 30, 40, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            width: 300px;
+            box-shadow: 0 0 15px rgba(255,0,0,0.4);
+            transition: all 0.4s;
+            backdrop-filter: blur(5px);
+        }
+        .location-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px rgba(33, 96, 222, 0.6);
+        }
+        .location-card h3 {
+            font-size: 24px;
+            color: #ff1b1b;
+            margin-bottom: 15px;
+        }
+        .location-card p {
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        /* Login & Signup Pages */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            padding: 40px 20px;
+        }
+        .auth-box {
+            background: rgba(30, 30, 40, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 27, 27, 0.5);
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 50px,
+                rgba(255, 27, 27, 0.1) 50px,
+                rgba(255, 27, 27, 0.1) 51px
+            );
+            animation: webMove 20s linear infinite;
+            z-index: -1;
+        }
+        @keyframes webMove {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .auth-box h2 {
+            font-family: 'Bangers';
+            color: #ff1b1b;
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px red;
+            position: relative;
+            z-index: 1;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ddd;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: rgba(20, 20, 30, 0.8);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff1b1b;
+            box-shadow: 0 0 10px rgba(255, 27, 27, 0.5);
+            transform: scale(1.02);
+        }
+        .auth-button {
+            width: 100%;
+            padding: 15px;
+            background: #ff1b1b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-family: 'Bangers';
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .auth-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .auth-button:hover::before {
+            left: 100%;
+        }
+        .auth-button:hover {
+            background: #2160de;
+            transform: scale(1.02);
+        }
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .auth-links a {
+            color: #ff1b1b;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .auth-links a:hover {
+            text-shadow: 0 0 10px red;
+        }
+        .spiderman-icon {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 60px;
+            color: #ff1b1b;
+            animation: swing 3s infinite ease-in-out;
+            position: relative;
+            z-index: 1;
+        }
+        .password-strength {
+            height: 5px;
+            width: 100%;
+            background: #333;
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .strength-meter {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+            border-radius: 3px;
+        }
+        .weak { background: #ff1b1b; width: 33%; }
+        .medium { background: #ffcc00; width: 66%; }
+        .strong { background: #00cc66; width: 100%; }
+
+        /* Profile Page */
+        .profile-container {
+            padding: 80px 50px;
+            text-align: center;
+        }
+        .profile-card {
+            background: rgba(30, 30, 40, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);
+            max-width: 600px;
+            margin: 0 auto;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .profile-header {
+            margin-bottom: 30px;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff1b1b, #2160de);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: white;
+        }
+        .profile-info {
+            text-align: left;
+        }
+        .profile-field {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .profile-field label {
+            font-weight: bold;
+            color: #ff1b1b;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .profile-field span {
+            color: #ddd;
+        }
+
+        /* Footer */
+        footer{
+            padding:30px;
+            text-align:center;
+            background:#000;
+            margin-top:50px;
+            border-top: 2px solid #ff1b1b;
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+        .footer-section {
+            flex: 1;
+            min-width: 300px;
+            margin-bottom: 20px;
+        }
+        .footer-section h3 {
+            font-family: 'Bangers';
+            color: #ff1b1b;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: #ff1b1b;
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s;
+        }
+        .social-links a:hover {
+            background: #2160de;
+            transform: translateY(-5px);
+        }
+
+        /* Web Strings Animation */
+        .web-string {
+            position: fixed;
+            width: 2px;
+            height: 0;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.5), transparent);
+            transform-origin: top;
+            z-index: -1;
+            animation: webGrow 5s ease-out forwards;
+        }
+
+        @keyframes webGrow {
+            to {
+                height: 100vh;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding-top: 120px;
+            }
+            .hero .text {
+                max-width: 100%;
+                margin-bottom: 50px;
+            }
+            .hero img {
+                position: relative;
+                right: 0;
+                width: 80%;
+                max-width: 400px;
+            }
+            header {
+                padding: 15px 20px;
+            }
+            header h1 {
+                font-size: 30px;
+            }
+            nav a {
+                font-size: 16px;
+                margin-left: 15px;
+            }
+            .auth-box {
+                padding: 30px 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero {
+                padding: 120px 20px 50px;
+            }
+            .hero h2 {
+                font-size: 40px;
+            }
+            .hero p {
+                font-size: 16px;
+            }
+            .products, .locations, .profile-container {
+                padding: 60px 20px;
+            }
+            .products h2, .locations h2 {
+                font-size: 36px;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="webCanvas"></canvas>
+
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <header>
+        <h1>Spidy Gadgets</h1>
+        <nav>
+            <a href="#" class="nav-link" data-page="home">Home</a>
+            <a href="#" class="nav-link" data-page="products">Products</a>
+            <a href="#" class="nav-link" data-page="locations">Locations</a>
+            <a href="#" class="nav-link" data-page="profile">Profile</a>
+            <a href="#" class="nav-link" data-page="login" id="login-link">Login</a>
+        </nav>
+    </header>
+
+    <!-- Home Page -->
+    <div id="home-page" class="page-container active-page">
+        <section class="hero" id="home">
+            <div class="text">
+                <h2>The Ultimate Spider-Man Store</h2>
+                <p>Playful, exciting, and interactive! Explore Spider-Man toys, T-shirts, games, water bottles and more! Owned by Santhosh – Lawspet, Pondicherry.</p>
+                <button id="shop-now-btn">Shop Now</button>
+            </div>
+            <img src="https://pngimg.com/uploads/spider_man/spider_man_PNG82.png" alt="Spiderman">
+            
+            <!-- Floating Spiders -->
+            <div class="spider" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+            <div class="spider" style="top: 60%; left: 80%; animation-delay: 5s;"></div>
+            <div class="spider" style="top: 80%; left: 40%; animation-delay: 10s;"></div>
+        </section>
+
+        <section class="products" id="products">
+            <h2>Our Spider Products</h2>
+            <p>Discover amazing Spider-Man merchandise that will make you feel like a superhero!</p>
+            <div class="grid">
+                <div class="card">
+                    <div class="product-icon">
+                        <i class="fas fa-wine-bottle"></i>
+                    </div>
+                    <h3>Spider-Man Water Bottle</h3>
+                    <p>Stay hydrated with this cool Spider-Man themed water bottle</p>
+                    <div class="price">₹1,249</div>
+                    <button>Add to Cart</button>
+                </div>
+                <div class="card">
+                    <div class="product-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>Spider-Man Toy Figure</h3>
+                    <p>Action figure with multiple poses and accessories</p>
+                    <div class="price">₹2,079</div>
+                    <button>Add to Cart</button>
+                </div>
+                <div class="card">
+                    <div class="product-icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <h3>Spider-Man T-Shirt</h3>
+                    <p>Comfortable cotton t-shirt with awesome Spider-Man design</p>
+                    <div class="price">₹1,659</div>
+                    <button>Add to Cart</button>
+                </div>
+                <div class="card">
+                    <div class="product-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3>Spider-Man School Bag</h3>
+                    <p>Durable backpack with multiple compartments</p>
+                    <div class="price">₹2,499</div>
+                    <button>Add to Cart</button>
+                </div>
+                <div class="card">
+                    <div class="product-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3>Spider-Man Video Game</h3>
+                    <p>Latest Spider-Man adventure game for all consoles</p>
+                    <div class="price">₹4,999</div>
+                    <button>Add to Cart</button>
+                </div>
+                <div class="card">
+                    <div class="product-icon">
+                        <i class="fas fa-mask"></i>
+                    </div>
+                    <h3>Spider-Man Costume</h3>
+                    <p>Complete Spider-Man costume with mask and web shooters</p>
+                    <div class="price">₹3,319</div>
+                    <button>Add to Cart</button>
+                </div>
+                <div class="card">
+                    <div class="product-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h3>Spider-Man Puzzle</h3>
+                    <p>1000-piece jigsaw puzzle featuring Spider-Man</p>
+                    <div class="price">₹1,659</div>
+                    <button>Add to Cart</button>
+                </div>
+                <div class="card">
+                    <div class="product-icon">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                    <h3>Spider-Man Bed Set</h3>
+                    <p>Complete bed set with pillowcases and comforter</p>
+                    <div class="price">₹4,149</div>
+                    <button>Add to Cart</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="locations" id="locations">
+            <h2>Our Store Locations</h2>
+            <div class="location-cards">
+                <div class="location-card">
+                    <h3>Tamil Nadu</h3>
+                    <p>123 Web Street</p>
+                    <p>Chennai, Tamil Nadu</p>
+                    <p>Phone: +91 98765 43210</p>
+                </div>
+                <div class="location-card">
+                    <h3>Pondicherry</h3>
+                    <p>456 Spider Lane</p>
+                    <p>Pondicherry</p>
+                    <p>Phone: +91 98765 43211</p>
+                </div>
+                <div class="location-card">
+                    <h3>Lawspet</h3>
+                    <p>789 Hero Road</p>
+                    <p>Lawspet, Puducherry</p>
+                    <p>Phone: +91 98765 43212</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="page-container">
+        <div class="auth-container">
+            <div class="auth-box">
+                <div class="spiderman-icon">
+                    <i class="fas fa-mask"></i>
+                </div>
+                <h2>Login to Spidy Gadgets</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="auth-button">Login</button>
+                </form>
+                <div class="auth-links">
+                    <p>Don't have an account? <a href="#" id="signup-link">Sign Up</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div id="signup-page" class="page-container">
+        <div class="auth-container">
+            <div class="auth-box">
+                <div class="spiderman-icon">
+                    <i class="fas fa-spider"></i>
+                </div>
+                <h2>Join Spidy Gadgets</h2>
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required>
+                        <div class="password-strength">
+                            <div class="strength-meter" id="password-strength-meter"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-confirm">Confirm Password</label>
+                        <input type="password" id="signup-confirm" required>
+                    </div>
+                    <button type="submit" class="auth-button">Create Account</button>
+                </form>
+                <div class="auth-links">
+                    <p>Already have an account? <a href="#" id="login-link-2">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profile-page" class="page-container">
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2>User Profile</h2>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-field">
+                        <label>Full Name</label>
+                        <span id="profile-name">Peter Parker</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Email</label>
+                        <span id="profile-email">peter.parker@example.com</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Member Since</label>
+                        <span id="profile-date">January 2023</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Favorite Spider-Man</label>
+                        <span id="profile-fav">Miles Morales</span>
+                    </div>
+                </div>
+                <button class="auth-button" style="margin-top: 20px;" id="logout-btn">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Spidy Gadgets</h3>
+                <p>We are the ultimate destination for Spider-Man fans of all ages. Founded by Santhosh, we bring you the coolest Spider-Man merchandise from around the world.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@spidygadgets.com</p>
+                <p>Phone: +91 98765 43210</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <p>© 2025 Spidy Gadgets | Owned by Santhosh, Lawspet – Pondicherry.</p>
+    </footer>
+
+    <script>
+        // Enhanced Spider Web Animation
+        const canvas = document.getElementById("webCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+
+        let mouse = {x: undefined, y: undefined};
+        window.addEventListener("mousemove", function(e) {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            setTimeout(() => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            }, 100);
+        });
+
+        // Create web strings on click
+        document.addEventListener('click', (e) => {
+            createWebString(e.clientX, e.clientY);
+        });
+
+        function createWebString(x, y) {
+            const webString = document.createElement('div');
+            webString.classList.add('web-string');
+            webString.style.left = x + 'px';
+            webString.style.top = y + 'px';
+            webString.style.transform = `rotate(${Math.random() * 360}deg)`;
+            document.body.appendChild(webString);
+            
+            setTimeout(() => {
+                webString.remove();
+            }, 5000);
+        }
+
+        // Create initial web strings
+        for (let i = 0; i < 10; i++) {
+            setTimeout(() => {
+                createWebString(
+                    Math.random() * window.innerWidth,
+                    Math.random() * window.innerHeight
+                );
+            }, i * 500);
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = `rgba(255, ${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 100)}, 0.8)`;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                // Attract to mouse
+                if (mouse.x !== undefined && mouse.y !== undefined) {
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 100) {
+                        this.speedX += dx * 0.0005;
+                        this.speedY += dy * 0.0005;
+                    }
+                }
+                
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        let particles = [];
+        for (let i = 0; i < 150; i++) {
+            particles.push(new Particle());
+        }
+
+        function connectLines() {
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    let dx = particles[a].x - particles[b].x;
+                    let dy = particles[a].y - particles[b].y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 120) {
+                        let opacity = 1 - dist/120;
+                        ctx.strokeStyle = `rgba(255, 0, 0, ${opacity * 0.3})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+                
+                // Connect particles to mouse
+                if (mouse.x !== undefined && mouse.y !== undefined) {
+                    let dx = particles[a].x - mouse.x;
+                    let dy = particles[a].y - mouse.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 150) {
+                        let opacity = 1 - dist/150;
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.2})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Add pulsing background effect
+            const time = Date.now() * 0.001;
+            const pulse = Math.sin(time) * 0.1 + 0.9;
+            ctx.fillStyle = `rgba(10, 0, 20, ${0.1 * pulse})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            connectLines();
+            
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Add hover effects to product cards
+        const productCards = document.querySelectorAll('.card');
+        
+        productCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'scale(1.5)';
+                cursor.style.backgroundColor = '#2160de';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'scale(1)';
+                cursor.style.backgroundColor = '#ff1b1b';
+            });
+        });
+
+        // Add animation to buttons on hover
+        const buttons = document.querySelectorAll('button');
+        
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'scale(2)';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'scale(1)';
+            });
+        });
+
+        // Page Navigation
+        const pages = document.querySelectorAll('.page-container');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active-page');
+            });
+            document.getElementById(pageId).classList.add('active-page');
+            
+            // Update active nav link
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        // Set up navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = link.getAttribute('data-page') + '-page';
+                showPage(pageId);
+            });
+        });
+        
+        // Shop Now button
+        document.getElementById('shop-now-btn').addEventListener('click', () => {
+            showPage('products-page');
+        });
+        
+        // Auth navigation
+        document.getElementById('signup-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('signup-page');
+        });
+        
+        document.getElementById('login-link-2').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('login-page');
+        });
+        
+        // Password strength indicator
+        const passwordInput = document.getElementById('signup-password');
+        const strengthMeter = document.getElementById('password-strength-meter');
+        
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            let strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/\d/)) strength++;
+            if (password.match(/[^a-zA-Z\d]/)) strength++;
+            
+            strengthMeter.className = 'strength-meter';
+            if (strength === 0) {
+                // No class added
+            } else if (strength <= 2) {
+                strengthMeter.classList.add('weak');
+            } else if (strength === 3) {
+                strengthMeter.classList.add('medium');
+            } else {
+                strengthMeter.classList.add('strong');
+            }
+        });
+        
+        // Form handling
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Simple validation
+            if (email && password) {
+                // In a real app, you would send this to a server
+                // For demo, we'll just show the profile page
+                document.getElementById('profile-name').textContent = email.split('@')[0];
+                document.getElementById('profile-email').textContent = email;
+                showPage('profile-page');
+                
+                // Update login link to show profile
+                document.getElementById('login-link').textContent = 'Profile';
+                document.getElementById('login-link').setAttribute('data-page', 'profile');
+            } else {
+                alert('Please fill in all fields');
+            }
+        });
+        
+        document.getElementById('signup-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            
+            // Simple validation
+            if (name && email && password && confirm) {
+                if (password !== confirm) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                
+                // In a real app, you would send this to a server
+                // For demo, we'll just show the profile page
+                document.getElementById('profile-name').textContent = name;
+                document.getElementById('profile-email').textContent = email;
+                document.getElementById('profile-date').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                showPage('profile-page');
+                
+                // Update login link to show profile
+                document.getElementById('login-link').textContent = 'Profile';
+                document.getElementById('login-link').setAttribute('data-page', 'profile');
+            } else {
+                alert('Please fill in all fields');
+            }
+        });
+        
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            // Reset login link
+            document.getElementById('login-link').textContent = 'Login';
+            document.getElementById('login-link').setAttribute('data-page', 'login');
+            
+            // Clear form fields
+            document.getElementById('login-form').reset();
+            document.getElementById('signup-form').reset();
+            
+            // Show login page
+            showPage('login-page');
+        });
+
+        // Add parallax effect to hero image
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroImage = document.querySelector('.hero img');
+            if (heroImage) {
+                heroImage.style.transform = `translateY(${scrolled * 0.5}px) rotate(${scrolled * 0.02}deg)`;
+            }
+        });
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', function() {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+        });
+    </script>
+</body>
+</html>
