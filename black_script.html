@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Script - Next-Gen E-Learning</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0a0a18;
+            --secondary: #1a1a2e;
+            --accent: #2de2f0;
+            --accent2: #f72585;
+            --text: #f8f9fa;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: var(--primary);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 0;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .logo i {
+            font-size: 2.2rem;
+            color: var(--accent2);
+            transform: rotate(-15deg);
+            transition: var(--transition);
+        }
+        
+        .logo:hover i {
+            transform: rotate(0deg) scale(1.2);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 5px 0;
+            transition: var(--transition);
+        }
+        
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: var(--transition);
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+        
+        .cta-button {
+            background: linear-gradient(45deg, var(--accent), #00a8ff);
+            color: var(--primary);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(45, 226, 240, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .cta-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .cta-button:hover:before {
+            left: 100%;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(45, 226, 240, 0.5);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 100px 0;
+            position: relative;
+        }
+        
+        .hero h1 {
+            font-size: 4.5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            max-width: 800px;
+            background: linear-gradient(to right, #f8f9fa, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .hero p {
+            font-size: 1.4rem;
+            max-width: 600px;
+            margin-bottom: 40px;
+            color: #b8b8d9;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .secondary-button {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .secondary-button:hover {
+            background: rgba(45, 226, 240, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        /* Features Section */
+        .section-title {
+            text-align: center;
+            margin-bottom: 70px;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 2.8rem;
+            display: inline-block;
+            background: linear-gradient(to right, #f8f9fa, var(--accent2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .features {
+            padding: 100px 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(26, 26, 46, 0.7);
+            border-radius: 20px;
+            padding: 40px 30px;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(45, 226, 240, 0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.3);
+            border-color: rgba(45, 226, 240, 0.3);
+        }
+        
+        .feature-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+            z-index: -1;
+        }
+        
+        .feature-card:hover:before {
+            transform: scaleX(1);
+        }
+        
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+        
+        /* Courses Section */
+        .courses {
+            padding: 100px 0;
+            background: rgba(10, 10, 24, 0.8);
+            position: relative;
+        }
+        
+        .course-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+        }
+        
+        .course-card {
+            background: var(--secondary);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: var(--transition);
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .course-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(45, 226, 240, 0.2);
+        }
+        
+        .course-image {
+            height: 200px;
+            background: linear-gradient(45deg, #2a2a4a, #0a0a18);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .course-content {
+            padding: 25px;
+        }
+        
+        .course-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+        
+        .course-content p {
+            color: #b8b8d9;
+            margin-bottom: 20px;
+        }
+        
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        /* Pendulum Section */
+        .pendulum-section {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 100px 0;
+        }
+        
+        #pendulum-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .pendulum-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 0 20px;
+            z-index: 2;
+        }
+        
+        .pendulum-content h2 {
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, #f8f9fa, var(--accent2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Footer */
+        footer {
+            background: rgba(10, 10, 24, 0.95);
+            padding: 70px 0 30px;
+            border-top: 1px solid rgba(45, 226, 240, 0.1);
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 15px;
+        }
+        
+        .footer-column ul li a {
+            color: #b8b8d9;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-column ul li a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: var(--accent);
+            transition: var(--transition);
+        }
+        
+        .social-icons a:hover {
+            transform: translateY(-5px);
+            background: var(--accent);
+            color: var(--primary);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #b8b8d9;
+            font-size: 0.9rem;
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .section-title h2 {
+                font-size: 2.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Canvas -->
+    <canvas id="background-canvas"></canvas>
+    
+    <!-- Pendulum Section Canvas -->
+    <canvas id="pendulum-canvas"></canvas>
+    
+    <div class="container">
+        <!-- Navigation -->
+        <nav>
+            <a href="#" class="logo">
+                <i class="fas fa-code"></i>
+                <span>BLACK SCRIPT</span>
+            </a>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">Courses</a>
+                <a href="#">Features</a>
+                <a href="#">Pricing</a>
+                <a href="#">About</a>
+            </div>
+            <button class="cta-button">Get Started</button>
+        </nav>
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Transform Your Skills with <span class="floating" style="display:inline-block;">Interactive</span> Tech Learning</h1>
+            <p>Black Script revolutionizes e-learning with cutting-edge animations, 3D visualizations, and immersive experiences that make complex concepts simple.</p>
+            <div class="hero-buttons">
+                <button class="cta-button">Explore Courses</button>
+                <button class="secondary-button">View Demo</button>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="features">
+            <div class="section-title">
+                <h2>Why Choose Black Script?</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <h3>3D Visual Learning</h3>
+                    <p>Complex concepts visualized in interactive 3D environments for deeper understanding.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-vr-cardboard"></i>
+                    </div>
+                    <h3>Immersive Labs</h3>
+                    <p>Hands-on labs with real-time feedback and virtual environments for practical skills.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Powered Paths</h3>
+                    <p>Personalized learning journeys adapted to your progress and career goals.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Courses Section -->
+        <section class="courses">
+            <div class="section-title">
+                <h2>Popular Courses</h2>
+            </div>
+            <div class="course-cards">
+                <div class="course-card">
+                    <div class="course-image"></div>
+                    <div class="course-content">
+                        <h3>3D Animation Mastery</h3>
+                        <p>Learn professional animation techniques with industry-standard tools and workflows.</p>
+                        <div class="course-meta">
+                            <span><i class="far fa-clock"></i> 8 Weeks</span>
+                            <span><i class="fas fa-layer-group"></i> Advanced</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-image"></div>
+                    <div class="course-content">
+                        <h3>Interactive Web Development</h3>
+                        <p>Create stunning websites with Three.js, GSAP, and modern JavaScript techniques.</p>
+                        <div class="course-meta">
+                            <span><i class="far fa-clock"></i> 10 Weeks</span>
+                            <span><i class="fas fa-layer-group"></i> Intermediate</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-image"></div>
+                    <div class="course-content">
+                        <h3>Game Design & Development</h3>
+                        <p>From concept to playable game with Unity and advanced game mechanics.</p>
+                        <div class="course-meta">
+                            <span><i class="far fa-clock"></i> 12 Weeks</span>
+                            <span><i class="fas fa-layer-group"></i> Advanced</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Pendulum Section -->
+        <section class="pendulum-section">
+            <div class="pendulum-content">
+                <h2>Experience the Rhythm of Learning</h2>
+                <p>Our unique pendulum visualization represents the perfect balance between theory and practice that Black Script provides. Watch as concepts swing into understanding through interactive animations.</p>
+                <button class="cta-button" style="margin-top: 40px;">Discover Our Method</button>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Black Script</h3>
+                    <p>Revolutionizing education through immersive technology and interactive learning experiences.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Courses</h3>
+                    <ul>
+                        <li><a href="#">3D Animation</a></li>
+                        <li><a href="#">Web Development</a></li>
+                        <li><a href="#">Game Design</a></li>
+                        <li><a href="#">Data Science</a></li>
+                        <li><a href="#">AI & Machine Learning</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">Webinars</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Community</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> info@blackscript.io</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> San Francisco, CA</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 Black Script Technologies. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Three.js background
+        const bgCanvas = document.getElementById('background-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: bgCanvas, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        
+        // Create particles for background
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 5000;
+        
+        const posArray = new Float32Array(particlesCount * 3);
+        const colorArray = new Float32Array(particlesCount * 3);
+        
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 50;
+            colorArray[i] = Math.random();
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+        
+        // Material for particles
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+        
+        // Mesh for particles
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        // Add some geometric shapes
+        const geometries = [
+            new THREE.TetrahedronGeometry(1, 0),
+            new THREE.OctahedronGeometry(1, 0),
+            new THREE.DodecahedronGeometry(1, 0)
+        ];
+        
+        const shapes = [];
+        for(let i = 0; i < 15; i++) {
+            const geo = geometries[Math.floor(Math.random() * geometries.length)];
+            const material = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(Math.random() * 0xffffff),
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3
+            });
+            
+            const mesh = new THREE.Mesh(geo, material);
+            mesh.position.set(
+                (Math.random() - 0.5) * 30,
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 10 - 10
+            );
+            mesh.rotation.set(
+                Math.random() * Math.PI,
+                Math.random() * Math.PI,
+                Math.random() * Math.PI
+            );
+            
+            mesh.userData = {
+                speed: Math.random() * 0.01 + 0.005,
+                rotation: {
+                    x: Math.random() - 0.5,
+                    y: Math.random() - 0.5,
+                    z: Math.random() - 0.5
+                }
+            };
+            
+            scene.add(mesh);
+            shapes.push(mesh);
+        }
+        
+        // Camera position
+        camera.position.z = 5;
+        
+        // Mouse move interaction
+        const mouse = { x: 0, y: 0 };
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+        
+        // Animate background
+        function animateBackground() {
+            requestAnimationFrame(animateBackground);
+            
+            // Rotate particles
+            particlesMesh.rotation.x += 0.0005;
+            particlesMesh.rotation.y += 0.0005;
+            
+            // Move shapes
+            shapes.forEach(shape => {
+                shape.rotation.x += shape.userData.speed * shape.userData.rotation.x;
+                shape.rotation.y += shape.userData.speed * shape.userData.rotation.y;
+                shape.rotation.z += shape.userData.speed * shape.userData.rotation.z;
+                
+                // Move shapes with mouse
+                shape.position.x += mouse.x * 0.01;
+                shape.position.y += mouse.y * 0.01;
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        animateBackground();
+        
+        // Pendulum Animation
+        const pendulumCanvas = document.getElementById('pendulum-canvas');
+        const pendulumRenderer = new THREE.WebGLRenderer({ 
+            canvas: pendulumCanvas, 
+            alpha: true,
+            antialias: true 
+        });
+        pendulumRenderer.setSize(window.innerWidth, window.innerHeight);
+        
+        const pendulumScene = new THREE.Scene();
+        const pendulumCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        pendulumCamera.position.z = 15;
+        
+        // Create pendulum
+        const pendulumGroup = new THREE.Group();
+        pendulumScene.add(pendulumGroup);
+        
+        // Create pendulum string
+        const stringGeometry = new THREE.BoxGeometry(0.05, 10, 0.05);
+        const stringMaterial = new THREE.MeshBasicMaterial({ color: 0x2de2f0 });
+        const string = new THREE.Mesh(stringGeometry, stringMaterial);
+        string.position.y = -5;
+        pendulumGroup.add(string);
+        
+        // Create pendulum bob
+        const bobGeometry = new THREE.SphereGeometry(1, 32, 32);
+        const bobMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0xf72585,
+            wireframe: true
+        });
+        const bob = new THREE.Mesh(bobGeometry, bobMaterial);
+        bob.position.y = -10;
+        pendulumGroup.add(bob);
+        
+        // Add lighting
+        const light = new THREE.PointLight(0x2de2f0, 1, 100);
+        light.position.set(5, 5, 5);
+        pendulumScene.add(light);
+        
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        pendulumScene.add(ambientLight);
+        
+        // Animation variables
+        let angle = Math.PI / 4; // 45 degrees
+        let angularVelocity = 0;
+        const damping = 0.995;
+        const gravity = 0.002;
+        
+        // Animate pendulum
+        function animatePendulum() {
+            requestAnimationFrame(animatePendulum);
+            
+            // Physics simulation
+            const acceleration = -gravity * Math.sin(angle);
+            angularVelocity += acceleration;
+            angularVelocity *= damping;
+            angle += angularVelocity;
+            
+            // Update pendulum position
+            pendulumGroup.rotation.z = angle;
+            
+            pendulumRenderer.render(pendulumScene, pendulumCamera);
+        }
+        
+        animatePendulum();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            pendulumCamera.aspect = window.innerWidth / window.innerHeight;
+            pendulumCamera.updateProjectionMatrix();
+            pendulumRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // GSAP animations for scroll interactions
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Animate feature cards on scroll
+        gsap.utils.toArray('.feature-card').forEach(card => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 90%",
+                    toggleActions: "play none none none"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+        
+        // Animate course cards on scroll
+        gsap.utils.toArray('.course-card').forEach(card => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 90%",
+                    toggleActions: "play none none none"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out",
+                delay: 0.2
+            });
+        });
+        
+        // Button hover effects
+        document.querySelectorAll('.cta-button, .secondary-button').forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                gsap.to(button, {
+                    scale: 1.05,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                gsap.to(button, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+        });
+    </script>
+</body>
+</html>
